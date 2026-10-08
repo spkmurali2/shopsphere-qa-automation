@@ -1,0 +1,28 @@
+# Maven build output
+target/
+
+# TestNG & Surefire execution output
+test-output/
+surefire*
+*.dump
+*.dumpstream
+
+# IDE specific files
+.idea/
+*.iml
+*.ipr
+*.iws
+.project
+.classpath
+.settings/
+.vscode/
+
+# Logs and runtime artifacts
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS metadata
+.DS_Store
+Thumbs.db

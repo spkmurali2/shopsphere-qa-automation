@@ -1,0 +1,50 @@
+name: CI Automation & Release Quality Gate
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  qa-regression-gate:
+    name: Automated Regression Quality Gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Verify Google Chrome Installation
+        run: |
+          google-chrome --version || echo "Google Chrome pre-installed on GitHub runner"
+
+      - name: Execute Automated Regression Suite (Release Quality Gate)
+        run: |
+          xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" mvn clean test
+
+      - name: Archive Surefire Test Reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: surefire-test-reports
+          path: target/surefire-reports/
+          retention-days: 14
+
+      - name: Archive Failure Screenshots Evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-failure-screenshots
+          path: test-output/screenshots/
+          if-no-files-found: ignore
+          retention-days: 14

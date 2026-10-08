@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="ShopSphere Smoke Suite" verbose="1" parallel="none">
+    <listeners>
+        <listener class-name="com.shopsphere.listeners.TestListener"/>
+    </listeners>
+
+    <test name="P0 Smoke Tests">
+        <groups>
+            <run>
+                <include name="smoke"/>
+            </run>
+        </groups>
+        <packages>
+            <package name="com.shopsphere.tests"/>
+        </packages>
+    </test>
+</suite>
