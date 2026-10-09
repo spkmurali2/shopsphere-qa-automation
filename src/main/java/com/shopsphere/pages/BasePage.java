@@ -67,11 +67,12 @@ public abstract class BasePage {
     }
 
     /**
-     * Checks if element is currently displayed without throwing TimeoutException.
+     * Checks if element is currently displayed without blocking on explicit wait when absent.
      */
     protected boolean isDisplayed(By locator) {
         try {
-            return wait.until(ExpectedConditions.visibilityOfElementLocated(locator)).isDisplayed();
+            List<WebElement> elements = driver.findElements(locator);
+            return !elements.isEmpty() && elements.get(0).isDisplayed();
         } catch (Exception e) {
             return false;
         }
@@ -101,7 +102,7 @@ public abstract class BasePage {
     public void handleSecurityChallenge() {
         long startTime = System.currentTimeMillis();
         boolean clicked = false;
-        while (System.currentTimeMillis() - startTime < 45000) {
+        while (System.currentTimeMillis() - startTime < 10000) {
             String title = driver.getTitle();
             if (title != null && (title.contains("nopCommerce") || (!title.contains("Just a moment") && !title.isEmpty()))) {
                 break;
