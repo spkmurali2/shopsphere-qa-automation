@@ -48,7 +48,7 @@ jobs:
         run: |
           SUITE="${INPUT_SUITE:-testng-smoke.xml}"
           echo "Executing test suite: ${SUITE}"
-          xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" mvn clean test "-DsuiteFile=${SUITE}" "-Dheadless=false"
+          xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" mvn clean test "-DsuiteFile=${SUITE}" "-DmockServer=true" "-Dheadless=false"
 
       - name: Generate Allure HTML Report
         if: always()

@@ -33,6 +33,8 @@
         <browser>chrome</browser>
         <headless>false</headless>
         <suiteFile>testng-smoke.xml</suiteFile>
+        <baseUrl>https://demo.nopcommerce.com/</baseUrl>
+        <mockServer>false</mockServer>
     </properties>
 
     <dependencies>
@@ -94,6 +96,8 @@
                     <systemPropertyVariables>
                         <browser>${browser}</browser>
                         <headless>${headless}</headless>
+                        <baseUrl>${baseUrl}</baseUrl>
+                        <mockServer>${mockServer}</mockServer>
                     </systemPropertyVariables>
                     <reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
                 </configuration>

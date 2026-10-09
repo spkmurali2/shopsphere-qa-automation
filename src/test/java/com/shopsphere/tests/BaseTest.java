@@ -20,6 +20,11 @@ public abstract class BaseTest {
 
     @BeforeSuite(alwaysRun = true)
     public void suiteSetUp() {
+        boolean mockEnabled = Boolean.parseBoolean(System.getProperty("mockServer", "false"));
+        if (mockEnabled) {
+            int port = com.shopsphere.server.EmbeddedTestServer.startDynamic();
+            System.setProperty("baseUrl", "http://127.0.0.1:" + port + "/");
+        }
         DriverFactory.initDriver();
     }
 
@@ -34,6 +39,7 @@ public abstract class BaseTest {
     @AfterSuite(alwaysRun = true)
     public void tearDown() {
         DriverFactory.quitDriver();
+        com.shopsphere.server.EmbeddedTestServer.stop();
     }
 
     protected WebDriver getDriver() {
