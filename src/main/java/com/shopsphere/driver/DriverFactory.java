@@ -56,6 +56,7 @@ public final class DriverFactory {
                 ChromeOptions chromeOptions = new ChromeOptions();
                 if (headless) {
                     chromeOptions.addArguments("--headless=new");
+                    chromeOptions.addArguments("--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36");
                 }
                 // Sensible options for stability and realistic browsing behavior
                 chromeOptions.addArguments("--window-size=1920,1080");

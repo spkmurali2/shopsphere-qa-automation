@@ -6,12 +6,21 @@ on:
   pull_request:
     branches: [ main ]
   workflow_dispatch:
+    inputs:
+      suiteFile:
+        description: 'TestNG Suite XML to execute'
+        required: true
+        default: 'testng-smoke.xml'
+        type: choice
+        options:
+          - testng-smoke.xml
+          - testng.xml
 
 jobs:
   qa-regression-gate:
     name: Automated Regression Quality Gate
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 15
 
     steps:
       - name: Checkout Repository
@@ -28,9 +37,21 @@ jobs:
         run: |
           google-chrome --version || echo "Google Chrome pre-installed on GitHub runner"
 
-      - name: Execute Automated Regression Suite (Release Quality Gate)
+      - name: Install Xvfb (Virtual Display for Headed Chrome)
         run: |
-          mvn clean test -Dheadless=true
+          sudo apt-get update -y
+          sudo apt-get install -y xvfb
+
+      - name: Execute Automated Test Suite (Release Quality Gate)
+        run: |
+          SUITE="${{ github.event.inputs.suiteFile || 'testng-smoke.xml' }}"
+          echo "Executing test suite: ${SUITE}"
+          xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" mvn clean test "-DsuiteFile=${SUITE}" "-Dheadless=false"
+
+      - name: Generate Allure HTML Report
+        if: always()
+        run: |
+          mvn allure:report || echo "Allure report generation skipped"
 
       - name: Archive Surefire Test Reports
         if: always()
@@ -49,7 +70,7 @@ jobs:
           if-no-files-found: ignore
           retention-days: 14
 
-      - name: Archive Allure Test Results
+      - name: Archive Allure Raw Results
         if: always()
         uses: actions/upload-artifact@v4
         with:
@@ -57,3 +78,13 @@ jobs:
           path: allure-results/
           if-no-files-found: ignore
           retention-days: 14
+
+      - name: Archive Allure HTML Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-html-report
+          path: target/site/allure-maven-plugin/
+          if-no-files-found: ignore
+          retention-days: 14
+
