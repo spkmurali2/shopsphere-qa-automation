@@ -10,8 +10,7 @@ import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Listeners;
 
 /**
- * Base test harness managing driver lifecycle, test isolation,
- * and failure listener registration for all test suites.
+ * Base test class managing WebDriver lifecycle and test setup.
  */
 @Listeners(TestListener.class)
 public abstract class BaseTest {

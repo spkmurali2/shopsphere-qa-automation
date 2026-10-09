@@ -10,9 +10,8 @@ import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 
 /**
- * Built-in hermetic HTTP test server for CI/CD environments.
- * Eliminates flaky external third-party rate limiting, outages,
- * and Cloudflare bot challenges during CI quality gate validation.
+ * Lightweight local HTTP test server used during CI runs to avoid
+ * third-party rate limiting or bot-challenge interruptions.
  */
 public class EmbeddedTestServer {
 

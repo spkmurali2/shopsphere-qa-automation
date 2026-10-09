@@ -1,12 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
 <suite name="ShopSphere Automated Regression Suite" verbose="1" parallel="none">
-    <!--
-      Architectural Decision:
-      Tests run sequentially (parallel="none") to ensure deterministic stability against the public shared demo.
-      DriverFactory utilizes ThreadLocal<WebDriver> so parallel thread count can be enabled seamlessly
-      when dedicated staging environments with data isolation become available.
-    -->
+    <!-- Tests configured to run sequentially for stability -->
     <listeners>
         <listener class-name="com.shopsphere.listeners.TestListener"/>
         <listener class-name="io.qameta.allure.testng.AllureTestNg"/>
