@@ -8,6 +8,7 @@ surefire*
 *.dumpstream
 allure-results/
 allure-report/
+.allure/
 
 # IDE specific files
 .idea/

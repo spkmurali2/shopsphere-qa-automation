@@ -71,7 +71,13 @@ public final class DriverFactory {
         }
 
         driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(ConfigReader.getPageLoadTimeout()));
-        driver.manage().window().maximize();
+        try {
+            if (!headless) {
+                driver.manage().window().maximize();
+            }
+        } catch (Exception ignored) {
+            // Window size is already defined via --window-size=1920,1080 for headless/xvfb
+        }
 
         if (driver instanceof ChromiumDriver) {
             try {

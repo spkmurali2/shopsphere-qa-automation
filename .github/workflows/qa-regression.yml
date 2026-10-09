@@ -30,7 +30,7 @@ jobs:
 
       - name: Execute Automated Regression Suite (Release Quality Gate)
         run: |
-          xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" mvn clean test
+          mvn clean test -Dheadless=true
 
       - name: Archive Surefire Test Reports
         if: always()
