@@ -7,13 +7,8 @@
     </listeners>
 
     <test name="P0 Smoke Tests">
-        <groups>
-            <run>
-                <include name="smoke"/>
-            </run>
-        </groups>
-        <packages>
-            <package name="com.shopsphere.tests"/>
-        </packages>
+        <classes>
+            <class name="com.shopsphere.tests.SmokeTest"/>
+        </classes>
     </test>
 </suite>

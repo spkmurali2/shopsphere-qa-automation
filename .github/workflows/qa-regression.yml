@@ -43,8 +43,10 @@ jobs:
           sudo apt-get install -y xvfb
 
       - name: Execute Automated Test Suite (Release Quality Gate)
+        env:
+          INPUT_SUITE: ${{ github.event.inputs.suiteFile }}
         run: |
-          SUITE="${{ github.event.inputs.suiteFile || 'testng-smoke.xml' }}"
+          SUITE="${INPUT_SUITE:-testng-smoke.xml}"
           echo "Executing test suite: ${SUITE}"
           xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" mvn clean test "-DsuiteFile=${SUITE}" "-Dheadless=false"
 

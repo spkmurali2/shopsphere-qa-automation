@@ -32,7 +32,7 @@
         <!-- Execution defaults (overridable via CLI: -Dbrowser=chrome -Dheadless=true) -->
         <browser>chrome</browser>
         <headless>false</headless>
-        <suiteFile>testng.xml</suiteFile>
+        <suiteFile>testng-smoke.xml</suiteFile>
     </properties>
 
     <dependencies>
