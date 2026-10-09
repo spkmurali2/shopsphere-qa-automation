@@ -3,6 +3,7 @@
 <suite name="ShopSphere Smoke Suite" verbose="1" parallel="none">
     <listeners>
         <listener class-name="com.shopsphere.listeners.TestListener"/>
+        <listener class-name="io.qameta.allure.testng.AllureTestNg"/>
     </listeners>
 
     <test name="P0 Smoke Tests">

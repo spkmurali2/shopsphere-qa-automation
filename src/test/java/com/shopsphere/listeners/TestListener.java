@@ -90,10 +90,20 @@ public class TestListener implements ITestListener {
 
             Files.copy(srcFile.toPath(), targetPath);
             System.out.println("[FAILURE EVIDENCE] Screenshot captured at: " + targetPath.toAbsolutePath());
+            attachScreenshotToAllure(sanitizedTestName, driver);
         } catch (IOException e) {
             System.err.println("[ERROR] Failed to save screenshot file: " + e.getMessage());
         } catch (Exception e) {
             System.err.println("[WARN] Unexpected error capturing screenshot: " + e.getMessage());
+        }
+    }
+
+    @io.qameta.allure.Attachment(value = "Failure Screenshot - {0}", type = "image/png")
+    private byte[] attachScreenshotToAllure(String testName, WebDriver driver) {
+        try {
+            return ((TakesScreenshot) driver).getScreenshotAs(OutputType.BYTES);
+        } catch (Exception e) {
+            return new byte[0];
         }
     }
 

@@ -9,6 +9,7 @@
     -->
     <listeners>
         <listener class-name="com.shopsphere.listeners.TestListener"/>
+        <listener class-name="io.qameta.allure.testng.AllureTestNg"/>
     </listeners>
 
     <test name="Smoke &amp; Critical Flows">
@@ -23,21 +24,45 @@
         </classes>
     </test>
 
-    <test name="Shopping Cart Lifecycle">
+    <test name="Shopping Cart Lifecycle &amp; Boundaries">
         <classes>
             <class name="com.shopsphere.tests.CartTest"/>
         </classes>
     </test>
 
-    <test name="Navigation &amp; Routing">
+    <test name="Product Details &amp; Specifications">
         <classes>
-            <class name="com.shopsphere.tests.NavigationTest"/>
+            <class name="com.shopsphere.tests.ProductDetailsTest"/>
         </classes>
     </test>
 
-    <test name="Authentication Guardrails">
+    <test name="Customer Wishlist Management">
         <classes>
-            <class name="com.shopsphere.tests.AuthenticationNegativeTest"/>
+            <class name="com.shopsphere.tests.WishlistTest"/>
+        </classes>
+    </test>
+
+    <test name="Customer Account Registration">
+        <classes>
+            <class name="com.shopsphere.tests.RegistrationTest"/>
+        </classes>
+    </test>
+
+    <test name="Customer Authentication &amp; Recovery">
+        <classes>
+            <class name="com.shopsphere.tests.AuthenticationTest"/>
+        </classes>
+    </test>
+
+    <test name="Category &amp; Catalog Navigation">
+        <classes>
+            <class name="com.shopsphere.tests.CategoryNavigationTest"/>
+        </classes>
+    </test>
+
+    <test name="Footer Links &amp; Customer Services">
+        <classes>
+            <class name="com.shopsphere.tests.FooterAndCustomerServiceTest"/>
         </classes>
     </test>
 </suite>

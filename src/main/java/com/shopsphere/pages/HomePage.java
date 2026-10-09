@@ -23,6 +23,7 @@ public class HomePage extends BasePage {
     private final By searchButton = By.cssSelector("button.search-box-button");
     private final By loginLink = By.cssSelector("a.ico-login");
     private final By registerLink = By.cssSelector("a.ico-register");
+    private final By logoutLink = By.cssSelector("a.ico-logout");
     private final By cartLink = By.cssSelector("a.ico-cart");
     private final By cartQtyBadge = By.cssSelector("span.cart-qty");
 
@@ -98,9 +99,33 @@ public class HomePage extends BasePage {
         return new LoginPage(driver);
     }
 
+    public void clickLogin() {
+        goToLogin();
+    }
+
     public void goToRegister() {
         click(registerLink);
         waitForPageReady();
+    }
+
+    public void clickRegister() {
+        goToRegister();
+    }
+
+    public boolean isLoggedIn() {
+        return isDisplayed(logoutLink);
+    }
+
+    public HomePage logOutIfLoggedIn() {
+        if (isLoggedIn()) {
+            click(logoutLink);
+            waitForPageReady();
+        }
+        return this;
+    }
+
+    public boolean isSearchButtonDisplayed() {
+        return isDisplayed(searchButton);
     }
 
     public CartPage goToCart() {
@@ -158,5 +183,75 @@ public class HomePage extends BasePage {
             }
         } catch (Exception ignored) {
         }
+    }
+
+    private final By currencyDropdown = By.id("customerCurrency");
+    private final By wishlistLink = By.cssSelector("a.ico-wishlist");
+    private final By wishlistQtyBadge = By.cssSelector("span.wishlist-qty");
+    private final By sitemapLink = By.cssSelector("a[href*='sitemap']");
+    private final By shippingReturnsLink = By.cssSelector("a[href*='shipping-returns']");
+    private final By privacyNoticeLink = By.cssSelector("a[href*='privacy-notice']");
+    private final By conditionsOfUseLink = By.cssSelector("a[href*='conditions-of-use']");
+    private final By contactUsLink = By.cssSelector("a[href*='contactus']");
+    private final By featuredProductPrice = By.cssSelector(".product-item .actual-price");
+
+    public boolean isWishlistLinkDisplayed() {
+        return isDisplayed(wishlistLink);
+    }
+
+    public WishlistPage clickWishlistLink() {
+        click(wishlistLink);
+        waitForPageReady();
+        return new WishlistPage(driver);
+    }
+
+    public int getWishlistCount() {
+        try {
+            String text = getText(wishlistQtyBadge).replaceAll("[^0-9]", "");
+            return text.isEmpty() ? 0 : Integer.parseInt(text);
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
+    public boolean isCurrencySelectorDisplayed() {
+        return isDisplayed(currencyDropdown);
+    }
+
+    public HomePage selectCurrency(String currencyVisibleText) {
+        org.openqa.selenium.support.ui.Select select = new org.openqa.selenium.support.ui.Select(driver.findElement(currencyDropdown));
+        select.selectByVisibleText(currencyVisibleText);
+        waitForPageReady();
+        return this;
+    }
+
+    public String getFirstFeaturedProductPriceText() {
+        return getText(featuredProductPrice);
+    }
+
+    public void clickSitemap() {
+        click(sitemapLink);
+        waitForPageReady();
+    }
+
+    public void clickShippingAndReturns() {
+        click(shippingReturnsLink);
+        waitForPageReady();
+    }
+
+    public void clickPrivacyNotice() {
+        click(privacyNoticeLink);
+        waitForPageReady();
+    }
+
+    public void clickConditionsOfUse() {
+        click(conditionsOfUseLink);
+        waitForPageReady();
+    }
+
+    public ContactUsPage clickContactUs() {
+        click(contactUsLink);
+        waitForPageReady();
+        return new ContactUsPage(driver);
     }
 }

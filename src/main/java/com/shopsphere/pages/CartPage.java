@@ -117,4 +117,33 @@ public class CartPage extends BasePage {
             return "";
         }
     }
+
+    private final By discountCodeInput = By.cssSelector("#discountcouponcode");
+    private final By applyDiscountButton = By.cssSelector("#applydiscountcouponcode");
+    private final By couponMessage = By.cssSelector(".message-failure, .coupon-box .message, .message-error");
+    private final By continueShoppingButton = By.cssSelector("button[name='continueshopping'], button.continue-shopping-button");
+
+    public int getRowCount() {
+        return driver.findElements(cartRows).size();
+    }
+
+    public CartPage applyDiscountCoupon(String code) {
+        type(discountCodeInput, code);
+        click(applyDiscountButton);
+        waitForPageReady();
+        return this;
+    }
+
+    public String getCouponMessage() {
+        return isDisplayed(couponMessage) ? getText(couponMessage) : "";
+    }
+
+    public boolean isCheckoutButtonDisplayed() {
+        return isDisplayed(checkoutButton);
+    }
+
+    public void clickContinueShopping() {
+        click(continueShoppingButton);
+        waitForPageReady();
+    }
 }

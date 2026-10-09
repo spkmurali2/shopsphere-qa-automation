@@ -93,4 +93,40 @@ public class ProductPage extends BasePage {
         waitForPageReady();
         return new CartPage(driver);
     }
+
+    private final By addToWishlistButton = By.cssSelector("button[id^='add-to-wishlist-button-'], button.add-to-wishlist-button");
+    private final By addToCompareButton = By.cssSelector("button.add-to-compare-list-button");
+    private final By breadcrumbTrail = By.cssSelector(".breadcrumb");
+    private final By productReviewsLink = By.cssSelector("a[href*='productreviews'], .product-review-links a");
+    private final By emailFriendButton = By.cssSelector("button.email-a-friend-button");
+
+    public ProductPage addToWishlist() {
+        closeNotification();
+        click(addToWishlistButton);
+        wait.until(ExpectedConditions.visibilityOfElementLocated(notificationContent));
+        return this;
+    }
+
+    public ProductPage addToCompareList() {
+        closeNotification();
+        click(addToCompareButton);
+        wait.until(ExpectedConditions.visibilityOfElementLocated(notificationContent));
+        return this;
+    }
+
+    public boolean isNotificationDisplayed() {
+        return isDisplayed(notificationContent);
+    }
+
+    public String getBreadcrumbText() {
+        return isDisplayed(breadcrumbTrail) ? getText(breadcrumbTrail) : "";
+    }
+
+    public boolean isReviewsLinkDisplayed() {
+        return isDisplayed(productReviewsLink);
+    }
+
+    public boolean isEmailFriendButtonDisplayed() {
+        return isDisplayed(emailFriendButton);
+    }
 }

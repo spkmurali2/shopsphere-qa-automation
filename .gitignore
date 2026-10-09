@@ -6,6 +6,8 @@ test-output/
 surefire*
 *.dump
 *.dumpstream
+allure-results/
+allure-report/
 
 # IDE specific files
 .idea/

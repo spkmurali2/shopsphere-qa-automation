@@ -60,4 +60,16 @@ public class LoginPage extends BasePage {
     public String getEmailFieldErrorText() {
         return isDisplayed(emailFieldError) ? getText(emailFieldError) : "";
     }
+
+    private final By forgotPasswordLink = By.cssSelector("span.forgot-password a, a[href*='passwordrecovery']");
+
+    public boolean isForgotPasswordLinkDisplayed() {
+        return isDisplayed(forgotPasswordLink);
+    }
+
+    public PasswordRecoveryPage clickForgotPassword() {
+        click(forgotPasswordLink);
+        waitForPageReady();
+        return new PasswordRecoveryPage(driver);
+    }
 }

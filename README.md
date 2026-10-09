@@ -311,15 +311,22 @@ This prevents hardcoding test values across test methods, simplifies internation
 
 ---
 
-## 13. Failure Evidence & Debuggability
+## 13. Failure Evidence, Reporting & Allure Integration
 
-When an automated test fails in CI or locally, immediate visual context is critical for fast triage:
-* **Automated Screenshot Capture:** `TestListener` intercepts `onTestFailure()`, extracts the driver instance from the failed test class, and captures a timestamped screenshot saved to:
+When an automated test runs locally or in CI, rich visual context and metrics are generated across multiple reporting tiers:
+* **Interactive Allure HTML Reports:** Integrated via `allure-testng` and `allure-maven` plugin. Features `@Epic`, `@Feature`, `@Story`, `@Severity`, test step timelines, and embedded failure screenshots:
+  ```bash
+  # Generate and view interactive local Allure report in default browser:
+  mvn allure:serve
+
+  # Generate static standalone HTML report:
+  mvn allure:report
   ```
-  test-output/screenshots/[TestName]_[timestamp].png
-  ```
-* **Maven Surefire XML/HTML Reports:** Surefire captures full stack traces, execution durations, standard out logs, and failure details in `target/surefire-reports/`.
-* **CI Artifact Archival:** The GitHub Actions workflow automatically uploads `test-output/screenshots/` and `target/surefire-reports/` on every run, ensuring failure evidence is accessible even after runner teardown.
+* **Automated Failure Screenshot Capture:** `TestListener` intercepts `onTestFailure()`, captures a full-page PNG screenshot, and:
+  1. Saves evidence to disk: `test-output/screenshots/[TestName]_[timestamp].png`
+  2. Directly attaches the image into the Allure report via `@Attachment`.
+* **Maven Surefire XML/HTML Reports:** Standard Surefire XML reports generated in `target/surefire-reports/`.
+* **CI Artifact Archival:** The GitHub Actions workflow automatically uploads `allure-results/`, `test-output/screenshots/`, and `target/surefire-reports/` on every execution.
 
 ---
 
@@ -327,11 +334,11 @@ When an automated test fails in CI or locally, immediate visual context is criti
 
 | Attribute | Smoke Suite (`testng-smoke.xml`) | Regression Suite (`testng.xml`) |
 | :--- | :--- | :--- |
-| **Purpose** | High-speed health check of critical paths | Comprehensive functional, negative, and edge validation |
-| **Test Count** | 4 critical tests | 18 tests across all modules |
-| **Execution Time** | ~10 - 15 seconds | ~45 - 60 seconds |
+| **Purpose** | High-speed health check of critical journeys | Comprehensive 66-test functional & edge regression |
+| **Test Count** | 6 critical tests | 66 tests across 9 suites |
+| **Execution Time** | ~15 - 25 seconds | ~4 - 6 minutes |
 | **When to Run** | Pre-merge PR checks, post-deployment smoke | Scheduled nightly, pre-release candidate sign-off |
-| **Command** | `mvn test -DsuiteXmlFile=testng-smoke.xml` | `mvn clean test` |
+| **Command** | `mvn test -DsuiteFile=testng-smoke.xml` | `mvn clean test` |
 
 ---
 
@@ -348,14 +355,19 @@ When an automated test fails in CI or locally, immediate visual context is criti
 git clone https://github.com/your-username/shopsphere-qa-automation.git
 cd shopsphere-qa-automation
 
-# Execute full regression suite (headed mode)
+# Execute full 66-test regression suite
 mvn clean test
 
+# Generate and launch Allure interactive report
+mvn allure:serve
+
 # Execute smoke suite only
-mvn test -DsuiteXmlFile=testng-smoke.xml
+mvn test -DsuiteFile=testng-smoke.xml
 
 # Execute specific test class
+mvn test -Dtest=RegistrationTest
 mvn test -Dtest=CartTest
+mvn test -Dtest=SearchTest
 
 # Execute specific test method
 mvn test -Dtest=SearchTest#verifySearchWithExistingProductReturnsRelevantResults

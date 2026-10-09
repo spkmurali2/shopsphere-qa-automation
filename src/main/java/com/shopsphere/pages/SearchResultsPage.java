@@ -75,8 +75,16 @@ public class SearchResultsPage extends BasePage {
         return isDisplayed(noResultsBanner);
     }
 
+    public boolean hasResults() {
+        return getResultsCount() > 0;
+    }
+
     public String getNoResultsMessage() {
         return isDisplayed(noResultsBanner) ? getText(noResultsBanner) : "";
+    }
+
+    public String getNoResultsMessageText() {
+        return getNoResultsMessage();
     }
 
     public String getSearchInputKeyword() {
