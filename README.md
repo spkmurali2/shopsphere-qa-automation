@@ -1,6 +1,7 @@
 # ShopSphere – E-commerce QA Automation
 
-[![CI Regression Suite](https://github.com/your-username/shopsphere-qa-automation/actions/workflows/qa-regression.yml/badge.svg)](https://github.com/your-username/shopsphere-qa-automation/actions/workflows/qa-regression.yml)
+[![CI Automation & Release Quality Gate](https://github.com/spkmurali2/shopsphere-qa-automation/actions/workflows/qa-regression.yml/badge.svg)](https://github.com/spkmurali2/shopsphere-qa-automation/actions/workflows/qa-regression.yml)
+[![Allure Report](https://img.shields.io/badge/Allure%20Report-Integrated-brightgreen.svg)](https://github.com/spkmurali2/shopsphere-qa-automation/actions)
 [![Java 17](https://img.shields.io/badge/Java-17-orange.svg)](https://www.oracle.com/java/)
 [![Selenium WebDriver](https://img.shields.io/badge/Selenium-4.26.0-green.svg)](https://www.selenium.dev/)
 [![TestNG](https://img.shields.io/badge/TestNG-7.10.2-blue.svg)](https://testng.org/)
