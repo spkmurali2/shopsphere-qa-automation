@@ -1,44 +1,40 @@
-# Release Readiness Checklist: ShopSphere
+# Pre-Release Checklist: ShopSphere
 
-This checklist governs the formal release readiness verification process. Before any candidate build is approved for promotion to production, each quality gate item must be validated and signed off by the QA Lead.
-
----
-
-## 1. Release Metadata
-* **Release Version / Tag:** `vX.Y.Z`
-* **Commit SHA:** `[git commit hash]`
-* **Target Environment:** `[Staging / Pre-Production]`
-* **Target Release Date:** `YYYY-MM-DD`
-* **Lead QA Assessor:** `[QA Engineer Name]`
+This is the checklist I use before tagging a release, opening a pull request, or pushing changes to `main`.
 
 ---
 
-## 2. Quality Gate Verification Table
+## 1. Local Verification
 
-| Verification Item | Requirement / Threshold | Status | Evidence / Notes |
-| :--- | :--- | :--- | :--- |
-| **Functional Validation** | All in-scope user stories and acceptance criteria verified | `[ ] PASS / [ ] FAIL` | Linked Jira release dashboard |
-| **Automated Smoke Suite** | 100% pass rate on all P0 critical journey tests | `[ ] PASS / [ ] FAIL` | GitHub Actions Run #`[ID]` |
-| **Automated Regression Suite** | 100% pass rate on P0/P1 regression tests | `[ ] PASS / [ ] FAIL` | Maven Surefire Test Report |
-| **Exploratory Testing** | Time-boxed charter sessions completed across volatile areas | `[ ] PASS / [ ] FAIL` | Refer to exploratory-testing.md |
-| **P0 (Critical) Defects** | Exactly 0 open unresolved critical defects | `[ ] PASS / [ ] FAIL` | Defect Tracker Query: 0 open |
-| **P1 (High) Defects** | Exactly 0 open high defects (or approved PM waiver) | `[ ] PASS / [ ] FAIL` | Defect Tracker Query: 0 open |
-| **Known Issues & Workarounds** | All minor (P2/P3) deferred defects documented with workarounds | `[ ] PASS / [ ] FAIL` | Documented in Release Notes |
-| **Automation Health** | Zero unmanaged test flakiness; all assertions deterministic | `[ ] PASS / [ ] FAIL` | Clean retry logs |
-| **CI Build Status** | Green pipeline on `main` branch with clean test artifact upload | `[ ] PASS / [ ] FAIL` | GitHub Actions workflow status |
-| **Evidence Archived** | Test execution reports, logs, and screenshots safely archived | `[ ] PASS / [ ] FAIL` | `target/surefire-reports/` stored |
+- [ ] **Clean compile check (Offline / Local build):** Project compiles cleanly without errors (`mvn clean test-compile`).
+- [ ] **Smoke tests on live demo store (Live Demo, Headed Chrome):** Default smoke suite passes against the public demo store (`mvn test`).
+- [ ] **Smoke tests on embedded mock server (Mock Mode, Headed Chrome):** Sanity run on the local mock server (`mvn test "-DmockServer=true"`).
+- [ ] **Full regression on embedded mock server (Mock Mode, Headed Chrome):** All 66 tests pass against the local mock server (`mvn test "-DsuiteFile=testng.xml" "-DmockServer=true"`).
+- [ ] **Full regression on live demo store (Live Demo, Headed Chrome):** Full suite against the public demo store, noting network latency and shared data (`mvn test "-DsuiteFile=testng.xml"`).
+- [ ] **Headless mode check (Mock Mode, Headless Chrome):** Tests pass without opening browser windows (`mvn test "-DmockServer=true" "-Dheadless=true"`).
+- [ ] **Surefire reports verified (Local filesystem):** Reports generated under `target/surefire-reports/index.html` and `target/surefire-reports/emailable-report.html`.
+- [ ] **Allure report verified (Local filesystem / browser):** Standalone HTML report generated (`mvn allure:report` to `target/site/allure-maven-plugin/`) or served interactively (`mvn allure:serve`).
+- [ ] **Failure screenshots:** If any test fails, screenshots are captured in `test-output/screenshots/` and attached to Allure.
 
 ---
 
-## 3. Known Limitations & Edge-Case Considerations
-* **Shared Environment Constraints:** Verification on the shared public demo excludes live payment gateway transactions; manual smoke check of sandbox payment is conducted on isolated pre-production staging where applicable.
-* **Network Latency Overhead:** Cloudflare caching or cold starts may slightly elevate initial page load; resilient explicit waits handle this gracefully.
+## 2. Code and Repository Health
+
+- [ ] **Clean working tree:** `git status` shows no unexpected or temporary files.
+- [ ] **Configuration integrity:** `src/test/resources/config/` files have correct default values.
+- [ ] **Documentation updated:** Any new test scenarios or changes are documented in `README.md` and `docs/test-scenarios.md`.
+- [ ] **No hardcoded secrets:** Credentials, passwords, or personal paths are not committed.
 
 ---
 
-## 4. Final QA Recommendation
-* [ ] **GO:** All critical quality criteria satisfied. No blocking risks identified. Recommended for release.
-* [ ] **CONDITIONAL GO:** Minor non-blocking issues identified with documented workarounds and engineering agreement.
-* [ ] **NO-GO:** Critical test failure, regression defect, or incomplete quality gate. Release blocked pending resolution.
+## 3. CI Pipeline Check
 
-**Lead QA Sign-Off:** ___________________________  **Date:** _______________
+- [ ] **GitHub Actions passes:** The push or PR workflow finishes green on GitHub.
+- [ ] **Artifacts uploaded:** Surefire test reports and Allure results are attached to the workflow run.
+
+---
+
+## 4. Known Boundaries
+
+- Tests running against the embedded mock server verify test logic and framework stability.
+- Live payment and order submission are intentionally excluded because the public nopCommerce demo does not provide an isolated payment sandbox.

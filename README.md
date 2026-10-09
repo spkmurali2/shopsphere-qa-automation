@@ -1,96 +1,149 @@
 # ShopSphere – E-Commerce Test Automation
 
-ShopSphere is a test automation project I built to practise automating common e-commerce user journeys using Java, Selenium WebDriver, TestNG and Maven.
+ShopSphere is a test automation project I built to practice automating core e-commerce user journeys using Java, Selenium WebDriver, TestNG and Maven.
 
-I used the [nopCommerce demo store](https://demo.nopcommerce.com/) as the application under test. The project focuses on testing product search, product details, shopping cart functionality, registration, login and navigation.
+I used the public [nopCommerce demo store](https://demo.nopcommerce.com/) as the target application. To keep tests reliable in CI and when working offline, I also included a lightweight embedded mock server that simulates the key pages and actions.
 
 ## Tools Used
 
 - Java 17
-- Selenium WebDriver
-- TestNG
-- Maven
-- Allure Reports
+- Selenium WebDriver (4.26.0)
+- TestNG (7.10.2)
+- Apache Maven
+- Allure Reports (2.29.0)
 - Git and GitHub
 - GitHub Actions
 
 ## What I Tested
 
-The project contains 66 automated test methods across nine test classes.
+The test suite covers 66 automated tests across nine test classes:
 
-The main areas covered are:
+- Homepage and header navigation (smoke checks, logo, currency selector, cart and wishlist links)
+- Product search (exact match, partial match, case sensitivity, empty search alert, special characters, no-results messaging)
+- Product details (title, price, breadcrumbs, default quantity, review link, wishlist button)
+- Shopping cart (adding products, quantity updates, item removal, empty cart state, coupon code validation)
+- Wishlist (adding items, shareable URL, item removal, transferring items to cart)
+- User registration (field presence, required field errors, invalid email format, password mismatch, successful registration)
+- Authentication and password recovery (valid and invalid logins, empty input validation, recovery form validation)
+- Category navigation (Computers, Electronics, Apparel, Digital Downloads, Books, Jewelry, Gift Cards)
+- Footer and customer service (Contact Us form validation, privacy notice, conditions of use, currency switcher)
 
-- Homepage and navigation
-- Product search, including invalid and empty searches
-- Product details and product information
-- Shopping cart, quantity updates and item removal
-- Wishlist functionality
-- User registration and validation
-- Login and password recovery
-- Category navigation
-- Footer links and customer service pages
+I also documented test scenarios and manual exploratory notes in the `docs/` folder.
 
-I also documented exploratory testing scenarios and prioritised test cases based on their importance and risk.
+## Project Structure
 
-## Framework Structure
+```text
+shopsphere-qa-automation/
+├── .github/
+│   └── workflows/
+│       └── qa-regression.yml       # GitHub Actions workflow
+├── docs/
+│   ├── defect-template.md          # Bug report template
+│   ├── exploratory-testing.md      # Manual exploratory testing notes
+│   ├── release-checklist.md        # Pre-release checklist
+│   ├── test-scenarios.md           # 66 test scenarios catalog
+│   └── test-strategy.md            # Test strategy and technical approach
+├── src/
+│   ├── main/java/com/shopsphere/
+│   │   ├── config/ConfigReader.java
+│   │   ├── driver/DriverFactory.java
+│   │   ├── pages/                  # Page Object classes (BasePage, HomePage, CartPage, etc.)
+│   │   ├── server/EmbeddedTestServer.java # Embedded mock server for offline/CI runs
+│   │   └── utils/TestDataReader.java
+│   └── test/
+│       ├── java/com/shopsphere/
+│       │   ├── listeners/TestListener.java # Screenshot capture and Allure attachments
+│       │   └── tests/              # TestNG test classes (SmokeTest, CartTest, etc.)
+│       └── resources/config/       # config.properties and testdata.properties
+├── pom.xml                         # Maven dependencies and build configuration
+├── testng.xml                      # Full regression suite (66 tests)
+└── testng-smoke.xml                # Smoke test suite (6 tests)
+```
 
-I used the Page Object Model (POM) to separate page elements and actions from test cases. This makes the tests easier to read and maintain.
+## How to Run the Tests
 
-The framework also includes reusable browser setup, explicit waits, test data stored in properties files, and screenshots when tests fail.
+### Prerequisites
 
-Allure is used to present test execution results and failure evidence in a report.
+- Java 17 installed and configured (`java -version`)
+- Maven 3.9+ installed and configured (`mvn -version`)
+- Google Chrome browser installed
 
-## Running the Tests
+### Running Tests in Windows PowerShell
 
-Make sure Java 17 and Maven are installed.
+Run the default smoke test suite (6 tests against the live demo):
 
-Run the default smoke test suite:
-
-```bash
+```powershell
 mvn clean test
 ```
 
-Run the full regression suite:
+Run the smoke suite using the local embedded mock server:
 
-```bash
-mvn clean test -DsuiteFile=testng.xml
+```powershell
+mvn clean test "-DmockServer=true"
 ```
 
-Run the tests in headless mode:
+Run the full regression suite (66 tests against the live demo):
 
-```bash
-mvn clean test -Dheadless=true
+```powershell
+mvn clean test "-DsuiteFile=testng.xml"
 ```
 
-Generate and view the Allure report:
+Run the full regression suite against the local mock server:
 
-```bash
-mvn allure:serve
+```powershell
+mvn clean test "-DsuiteFile=testng.xml" "-DmockServer=true"
 ```
+
+Run tests in headless mode (no browser window):
+
+```powershell
+mvn clean test "-Dheadless=true"
+```
+
+Combined example (full regression, mock server, headless):
+
+```powershell
+mvn clean test "-DsuiteFile=testng.xml" "-DmockServer=true" "-Dheadless=true"
+```
+
+### Viewing Test Reports
+
+Surefire generates HTML and text reports after execution:
+- HTML overview: `target/surefire-reports/index.html`
+- Emailable report: `target/surefire-reports/emailable-report.html`
+
+Allure provides detailed execution dashboards:
+- Serve and view interactively in your browser:
+  ```powershell
+  mvn allure:serve
+  ```
+- Generate a standalone HTML report under `target/site/allure-maven-plugin/`:
+  ```powershell
+  mvn allure:report
+  ```
+
+Failure screenshots are automatically saved to `test-output/screenshots/` and attached directly to the Allure report.
 
 ## GitHub Actions
 
-GitHub Actions runs the smoke tests when changes are pushed to the repository or a pull request is opened. Test reports and failure screenshots are saved as workflow artifacts.
+The repository includes a GitHub Actions workflow (`.github/workflows/qa-regression.yml`) that runs on every push and pull request to `main`.
 
-The workflow acts as a quality gate: if a test fails, the workflow fails.
+- It runs the smoke test suite in an Ubuntu container with Chrome and Xvfb.
+- It uses the embedded mock server so the build is fast, deterministic, and not affected by external network drops or bot protection on the demo store.
+- Test reports, Allure results, and any failure screenshots are uploaded as workflow artifacts.
+- The full 66-test regression suite can also be triggered manually using GitHub Actions' `workflow_dispatch` option.
 
-## Test Environment
+## Limitations and What I Want to Improve Next
 
-For local execution, the framework is configured to use the public nopCommerce demo store.
+### Limitations
 
-For CI execution, it uses a lightweight local test server. This avoids problems caused by bot protection or availability issues on the shared public demo.
+- **Live Demo Changes:** The public nopCommerce demo is shared with other users, so its products, cart state, or availability can change unexpectedly.
+- **Mock Server Scope:** The embedded mock server simulates the HTML routes needed for these tests, but a passing run on the mock server tests framework logic, not live site health.
+- **Payment Processing:** End-to-end checkout and payment processing are not automated because the public demo does not offer a sandboxed payment gateway.
 
-Because the CI environment uses a mock server, a successful CI run does not necessarily mean that the live nopCommerce website passed the same tests.
+### What I Want to Improve Next
 
-## Limitations
-
-The public demo is shared with other users, so its content and behaviour may change.
-
-The current project focuses on UI testing. Payment processing and successful end-to-end order completion are not included in the current scope.
-
-## Future Improvements
-
-- Expand test coverage as needed
-- Improve test data and failure analysis
-- Add more scenarios based on exploratory testing
-- Explore parallel execution when test data and environment isolation are in place
+- Explore parallel test execution once test data isolation is expanded.
+- Add more negative and edge-case scenarios from the exploratory testing notes.
+- Add cross-browser runs in CI (Firefox and Edge).
+- Improve test reporting dashboards with historical trend tracking.

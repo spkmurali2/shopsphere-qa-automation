@@ -23,7 +23,7 @@ This document catalogs 66 test scenarios covering functional journeys, edge case
 | **SS-SRCH-009** | Search | Search by brand keyword ("Apple") | Functional | P1 High | Brand search yields matching brand catalogue items. | Automated |
 | **SS-SRCH-010** | Search | Boundary search query with 120+ characters | Boundary | P3 Low | Extremely long input string handled safely without buffer error. | Automated |
 | **SS-CART-001** | Cart | Add standard catalog product to cart from PDP | Functional | P0 Critical | Confirmation banner displayed; cart counter increments. | Automated |
-| **SS-CART-002** | Cart | Add duplicate product accumulates quantity | Functional | P1 High | Line item quantity increments ($\ge 2$) rather than duplicating rows. | Automated |
+| **SS-CART-002** | Cart | Add duplicate product accumulates quantity | Functional | P1 High | Line item quantity increments (>= 2) rather than duplicating rows. | Automated |
 | **SS-CART-003** | Cart | Update item quantity in cart table | Functional | P1 High | Updating quantity input and clicking update recalculates values. | Automated |
 | **SS-CART-004** | Cart | Remove product from cart renders empty state | Functional | P1 High | Removing line item renders "Your Shopping Cart is empty!". | Automated |
 | **SS-CART-005** | Cart | Setting quantity to 0 removes line item | Boundary | P1 High | Setting quantity to 0 removes the item upon cart update. | Automated |

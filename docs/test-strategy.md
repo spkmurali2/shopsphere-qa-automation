@@ -1,142 +1,88 @@
-# Test Strategy: ShopSphere E-Commerce QA Automation
+# Test Strategy: ShopSphere QA Automation
 
-## 1. Document Overview
-* **Project Name:** ShopSphere – E-commerce QA Automation Framework
-* **Target Application:** nopCommerce Public Demo Store (`https://demo.nopcommerce.com/`)
-* **Author:** QA Automation Team
-* **Target Audience:** Engineering Leads, QA Engineers, Release Managers, Product Owners
+## 1. Overview
+This document explains the testing strategy for the ShopSphere automation project. The goal is to verify core e-commerce user journeys on the [nopCommerce demo store](https://demo.nopcommerce.com/) using an automated regression suite and targeted manual exploration.
 
 ---
 
-## 2. Objective & Mission
-The objective of this test strategy is to define a structured, risk-based quality assurance approach for the ShopSphere e-commerce web platform. This document outlines the testing levels, scope, test environment considerations, automation principles, defect workflows, and quality gates required to deliver high confidence in release readiness.
+## 2. Scope of Testing
+
+### In-Scope
+- **Homepage and Header:** Navigation menus, header search, logo, and links to cart and wishlist.
+- **Product Search:** Exact keyword match, partial match, case sensitivity, leading/trailing spaces, empty query alerts, special characters, and no-results banners.
+- **Product Details:** Product title, price display, breadcrumbs, default quantity, customer reviews link, and add-to-wishlist button.
+- **Shopping Cart:** Adding items from product pages, updating quantities, removing items, empty cart state, and coupon code validation.
+- **Wishlist:** Adding items, shareable URL generation, item removal, and moving wishlist items to the cart.
+- **Registration and Authentication:** Required field validation, malformed email checks, password mismatch, successful registration with unique email, and password recovery form validation.
+- **Category Navigation & Footer:** Navigating top-level categories (Computers, Electronics, Apparel, etc.) and footer informational pages (Contact Us, Privacy Notice, Conditions of Use).
+
+### Out of Scope
+- **Payment Processing & Order Completion:** The public demo does not offer a sandboxed payment gateway, so real credit card payments and order completion are not automated.
+- **Performance & Load Testing:** Testing server load and latency thresholds is outside the scope of this functional UI test framework.
+- **Third-Party Integrations:** External OAuth logins and newsletter services are not tested.
 
 ---
 
-## 3. Scope of Testing
+## 3. Test Levels
 
-### 3.1 In-Scope (Automated & Manual)
-* **Homepage & Core Discovery:** Site availability, global navigation, category menus, currency selectors, and header utilities.
-* **Product Search & Filtering:** Exact keyword match, partial keyword match, case-insensitivity, no-results messaging, and search navigation.
-* **Product Details & Selection:** Product specifications display, quantity configuration, dynamic pricing display, and stock-status validation.
-* **Shopping Cart Operations:** Add to cart from listing/detail, quantity increments/decrements, item removal, empty cart state, subtotal/total calculations, and cart counter synchronization.
-* **User Authentication & Navigation:** Navigation to login/registration portals, client-side input validation, and invalid login credential feedback.
-* **Negative & Boundary Scenarios:** Search queries with special characters/non-existent SKUs, zero or negative quantities, and unauthenticated protected action handling.
+### Smoke Tests (P0)
+- **File:** `testng-smoke.xml` (6 tests)
+- **Goal:** Fast sanity check to confirm core pages and navigation are accessible.
+- **Cadence:** Run locally as a quick check and in GitHub Actions on every push or pull request.
 
-### 3.2 Out of Scope (Intentionally Excluded)
-* **Payment Gateway & Order Placement:** End-to-end payment submission and final order placement are excluded from automated test suites because the public shared demo environment (`demo.nopcommerce.com`) lacks sandboxed credit card validation, resets periodically, and shares cart/inventory states across public users.
-* **Third-Party Integrations:** External tracking beacons, social media login OAuth providers, and newsletter third-party sync.
-* **Performance / Load Testing:** Stress and spike testing are deferred to a dedicated performance test stage using specialized tooling (e.g., JMeter, k6) on an isolated staging cluster.
-* **Security & Penetration Testing:** Automated DAST/SAST penetration scanning is handled independently in the security pipeline.
+### Regression Tests (P1 & P2)
+- **File:** `testng.xml` (66 tests)
+- **Goal:** Comprehensive functional coverage across search, product pages, cart, wishlist, authentication, and categories.
+- **Cadence:** Run before merges or release candidates.
 
----
-
-## 4. Test Levels & Methodology
-
-```
-+-------------------------------------------------------+
-|                 Exploratory Testing                   |
-|        (Ad-hoc, edge cases, UX friction, races)       |
-+-------------------------------------------------------+
-|             Automated Regression Suite                |
-|      (Scheduled nightly / PR gates, full coverage)    |
-+-------------------------------------------------------+
-|                Automated Smoke Suite                  |
-|          (P0 Critical paths, pre-merge gates)         |
-+-------------------------------------------------------+
-```
-
-### 4.1 Smoke Testing (P0 Critical)
-* **Purpose:** Rapid health check of core revenue-generating user journeys.
-* **Cadence:** Executed on every pull request, deployment to staging, or pipeline trigger.
-* **Target Execution Time:** Under 2 minutes.
-* **Pass Criteria:** 100% pass rate. Any smoke failure immediately blocks the release pipeline.
-
-### 4.2 Functional & Regression Testing (P1/P2)
-* **Purpose:** Verify that recent modifications, bug fixes, or dependency updates have not degraded existing catalog or checkout features.
-* **Cadence:** Executed nightly and prior to release candidates.
-* **Scope:** Search accuracy, shopping cart manipulations, input validation, and multi-step user workflows.
-
-### 4.3 Negative Testing
-* **Purpose:** Ensure graceful error handling, informative user feedback, and defensive system behavior when presented with unexpected or malicious inputs.
-* **Examples:** Searching for gibberish strings, navigating with manipulated parameters, submitting malformed login credentials.
-
-### 4.4 Exploratory Testing
-* **Purpose:** Uncover unscripted anomalies, edge-case interaction races, visual alignment bugs, and subtle usability frictions that scripted checks cannot anticipate.
-* **Method:** Time-boxed charter sessions focusing on volatile e-commerce behaviors (e.g., rapid button tapping, session timeout mid-cart modification).
+### Negative & Boundary Tests
+- **Goal:** Verify that invalid or unusual inputs produce clear error messages rather than unhandled server errors.
+- **Examples:** Empty search submissions, non-existent products, passwords under 6 characters, invalid email formats, and setting cart quantity to 0.
 
 ---
 
-## 5. Risk-Based Testing Prioritization
-Resources and execution windows are finite. Testing efforts are prioritized using a Failure Mode and Effects Analysis (FMEA) approach assessing **Impact** (business revenue/customer trust) and **Likelihood** (code volatility/complexity).
+## 4. Test Prioritization
 
-| Priority Tier | Risk Profile | Functional Areas | Test Approach |
-| :--- | :--- | :--- | :--- |
-| **P0 - Critical** | Severe revenue loss; complete user journey block | Catalog load, Search discovery, Add to Cart, Cart Persistence | Fully automated smoke tests; zero-tolerance quality gate. |
-| **P1 - High** | Significant friction in customer conversion | Quantity changes, Item removal, Login validation, Search edge cases | Automated regression test coverage + exploratory testing. |
-| **P2 - Medium** | Degraded secondary feature; workaround exists | Category navigation, sorting options, footer links | Automated regression test coverage where cost-effective. |
-| **P3 - Low** | Minor cosmetic defect; negligible business impact | Static text formatting, minor alignment, tooltip styling | Targeted manual/exploratory verification. |
+Testing efforts are prioritized by user journey importance:
 
-### Why Critical Customer Journeys Receive Higher Priority
-In an e-commerce platform, the user journey flows sequentially through a conversion funnel:
-`Homepage -> Search / Discovery -> Product Detail -> Add to Cart -> Cart Review -> Checkout`.
-A break at the discovery or cart stage halts 100% of downstream revenue transactions. Therefore, automation assets are concentrated heavily on the discovery-to-cart funnel to provide immediate shift-left regression detection.
+1. **P0 (Critical):** Core shopping funnel — Homepage access, basic search, view product, add to cart. If these fail, the core shopping experience is blocked.
+2. **P1 (High):** Cart updates, item removal, user registration, login validation, and category navigation.
+3. **P2 (Medium):** Password recovery, wishlist management, search edge cases, footer links, and Contact Us form validation.
+4. **P3 (Low):** Minor edge cases, such as very long search queries (120+ characters) or empty coupon submissions.
 
 ---
 
-## 6. Automation Architecture & Design Principles
+## 5. Framework Architecture & Technical Design
 
-* **Page Object Model (POM):** Strict separation between UI locators/actions (encapsulated in page classes) and test assertions (maintained in test classes).
-* **Robust Explicit Synchronization:** Zero dependency on arbitrary `Thread.sleep()`. All element states are governed by dynamic `WebDriverWait` polling for visibility, clickability, and staleness.
-* **Stateless Test Isolation:** Every test method initializes and tears down its own browser instance via a clean `DriverFactory`, preventing cross-test pollution.
-* **ThreadLocal Driver Management:** ThreadLocal storage ensures thread-safe browser sessions, allowing seamless parallelization when dedicated environments become available.
-* **Environment Agnostic Configuration:** Browser type, base URL, and headless flags are driven externally by configuration files and Maven CLI overrides (`-Dheadless=true`).
-* **Automated Evidence Collection:** Custom TestNG listeners capture screenshots on test failure and log detailed execution context.
+The automation framework is built with Java, Selenium WebDriver, TestNG, and Maven:
 
----
-
-## 7. Test Environment & Data Strategy
-
-### 7.1 Environment
-* **Target:** Public nopCommerce demo store (`https://demo.nopcommerce.com/`).
-* **Characteristics:** Public multi-tenant environment subject to shared caching, automated content resets, and Cloudflare perimeter protection.
-* **Handling Strategy:** Robust selectors avoiding volatile session-specific attributes; defensive explicit waits capable of absorbing network latency fluctuations.
-
-### 7.2 Test Data Management
-* Test datasets (product names, search terms, quantities) are externalized in `src/test/resources/config/testdata.properties`.
-* Static test data relies on standard catalog items guaranteed to persist in baseline catalog templates (e.g., "Apple MacBook Pro", "Build your own computer").
-* Dynamic data (e.g., randomized search terms or email prefixes) is generated programmatically to avoid collisions.
+- **Page Object Model (POM):** Page elements and actions are encapsulated in classes under `com.shopsphere.pages`, keeping test logic in `com.shopsphere.tests` readable and easier to maintain.
+- **Explicit Waits:** `BasePage` uses `WebDriverWait` with `ExpectedConditions` (visibility, clickability) instead of hard-coded sleeps (`Thread.sleep`). A JavaScript click fallback handles cases where transient notification banners overlay buttons.
+- **Browser Lifecycle:** `DriverFactory` manages the WebDriver instance using `ThreadLocal<WebDriver>`. In `BaseTest`, the driver session is initialized for the test suite and cleanly closed in `@AfterSuite`.
+- **Sequential Execution:** Tests are configured to run sequentially (`parallel="none"` in `testng.xml`) to prevent state conflicts when interacting with the cart and session.
+- **External Configuration:** Settings are managed by `ConfigReader` with command-line overrides taking precedence (e.g. `-Dheadless=true`), followed by `config/config.properties`.
+- **External Test Data:** Product names, expected titles, and search terms are kept in `src/test/resources/config/testdata.properties` and read via `TestDataReader`.
+- **Failure Evidence:** `TestListener` implements TestNG's `ITestListener`. When a test fails, it captures a screenshot to `test-output/screenshots/` and attaches it to the Allure report.
 
 ---
 
-## 8. Defect Management Workflow
+## 6. Test Environments
 
-When a failure is detected:
-1. **Triage & Reproducibility:** Verify whether the failure is a product bug, automation issue (flaky locator), or environment outage.
-2. **Evidence Collection:** TestNG automatically stores timestamped full-page screenshots in `test-output/screenshots/`.
-3. **Defect Logging:** File Jira/GitHub issue using the standard template in [defect-template.md](file:///c:/Users/Priya%20Murali/Downloads/TestAutomation/docs/defect-template.md).
-4. **Lifecycle:** `New -> Triaged -> In Progress -> Fixed -> Retested -> Closed`.
+### Live nopCommerce Demo Store
+- URL: `https://demo.nopcommerce.com/`
+- Used for local manual exploration and local test execution.
+- Because it is a public shared demo, data can occasionally change or be reset.
 
----
-
-## 9. Entry & Exit Criteria
-
-### 9.1 Entry Criteria for Testing
-* Test environment is reachable and returns HTTP 200 on base URL.
-* Stable build deployed with no blocking environmental degradation.
-* Test suite configuration files and test data properties are verified.
-
-### 9.2 Exit Criteria for Release Candidate
-* **Smoke Tests:** 100% passing on the target build.
-* **Automated Regression Suite:** 100% pass rate on P0/P1 scenarios (or known test failures formally triaged and approved with workarounds).
-* **Defect Metrics:** 0 open Critical (P0) or High (P1) defects.
-* **Evidence:** Complete Surefire test reports and failure artifacts archived in CI.
-* **QA Sign-off:** Completed and reviewed sign-off document.
+### Embedded Mock Server
+- A lightweight HTTP server (`EmbeddedTestServer`) built into the project using Java's built-in `HttpServer`.
+- Enabled via `-DmockServer=true`.
+- Simulates the required HTML routes and forms locally without external network calls or bot protection issues.
+- Used in GitHub Actions CI to ensure fast, deterministic pipeline runs.
+- **Note:** Passing tests on the mock server verify the framework logic and test assertions, but do not prove that the live demo site passed.
 
 ---
 
-## 10. Release Decision Approach
-Release readiness is not determined by gut feeling or raw test counts; it is governed by verifiable quality gates:
-1. Continuous Integration: Headless GitHub Actions workflow execution completed cleanly.
-2. Risk Assessment: Any accepted edge-case defects documented with mitigation paths.
-3. Sign-off: Formal consensus between QA, Development, and Product leads based on the [release-checklist.md](file:///c:/Users/Priya%20Murali/Downloads/TestAutomation/docs/release-checklist.md).
+## 7. Defect & Release Workflow
+
+- When an unexpected issue is found during exploratory or automated testing, it is logged using the format in [defect-template.md](defect-template.md).
+- Before merging or tagging changes, the pre-flight checks in [release-checklist.md](release-checklist.md) are verified.
